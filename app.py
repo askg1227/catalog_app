@@ -3,6 +3,22 @@ import pandas as pd
 import os
 import io
 
+# =============================
+# images.zip を解凍（初回のみ）
+# =============================
+import zipfile
+
+ZIP_FILE = "images.zip"
+IMAGE_DIR = "images"
+
+if not os.path.exists(IMAGE_DIR):
+    if os.path.exists(ZIP_FILE):
+        with zipfile.ZipFile(ZIP_FILE, 'r') as zip_ref:
+            zip_ref.extractall(IMAGE_DIR)
+        print("images.zip を解凍しました")
+    else:
+        print("images.zip が見つかりません")
+
 EXCEL_FILE = "商品マスタ統合_raw.xlsx"
 
 # =============================
