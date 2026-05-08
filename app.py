@@ -14,7 +14,7 @@ IMAGE_DIR = "images"
 if not os.path.exists(IMAGE_DIR):
     if os.path.exists(ZIP_FILE):
         with zipfile.ZipFile(ZIP_FILE, 'r') as zip_ref:
-            zip_ref.extractall(IMAGE_DIR)
+            zip_ref.extractall(".")  # ZIP の中に images/ が入っているのでカレントに解凍
         print("images.zip を解凍しました")
     else:
         print("images.zip が見つかりません")
