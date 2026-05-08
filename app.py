@@ -123,16 +123,38 @@ for idx, row in filtered.iterrows():
         # 画像を左、情報を右
         c1, c2 = st.columns([2, 3])
 
-        # ---------- 画像（左） ----------
-        with c1:
-            raw_path = str(row["画像パス"])
-            filename = os.path.basename(raw_path)
-            img_path = os.path.join("images", filename)
+# ---------- 画像（左） ----------
+with c1:
+    import requests
+    import re
 
-            if os.path.exists(img_path):
-                st.image(img_path, width=260)   # ← 大きめ画像
-            else:
-                st.write("画像なし")
+    # Google Drive フォルダID（あすかのフォルダ）
+    FOLDER_ID = "13W16asSx-IYHfhRw76enbQ8iiUKFP-Y2"
+
+    @st.cache_data
+    def get_drive_file_map(folder_id):
+        url = f"https://www.googleapis.com/drive/v3/files?q='{folder_id}'+in+parents&fields=files(id,name)&key=AIzaSyCxyCoqmdxvesovEBXBQXwLWlpyhCXDVco"
+        r = requests.get(url)
+        data = r.json()
+        file_map = {}
+        if "files" in data:
+            for f in data["files"]:
+                file_map[f["name"]] = f["id"]
+            return file_map
+
+    def drive_image_url(file_id):
+        return f"https://drive.google.com/uc?export=view&id={file_id}"
+
+    file_map = get_drive_file_map(FOLDER_ID)
+
+    raw_path = str(row["画像パス"])
+    filename = re.sub(r".*[/\\\\]", "", raw_path)
+
+    if filename in file_map:
+        img_url = drive_image_url(file_map[filename])
+        st.image(img_url, width=260)
+    else:
+        st.write("画像なし（Drive にファイルがありません）")
 
         # ---------- 商品情報（右） ----------
         with c2:
